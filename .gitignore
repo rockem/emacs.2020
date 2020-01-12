@@ -6,3 +6,5 @@ elpa
 .emacs.desktop*
 settings.el
 .#*
+recentf
+*.dat
