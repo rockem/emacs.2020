@@ -1,0 +1,117 @@
+#+TITLE: My Emacs Settings
+
+* Bootstrap
+#+BEGIN_SRC emacs-lisp
+  (setq make-backup-files nil)
+  (defalias 'yes-or-no-p 'y-or-n-p)
+
+  (setq echo-keystrokes 0.1
+        use-dialog-box nil)
+
+  (defun reload-init-file ()
+    (interactive)
+    (load-file user-init-file))
+
+  (global-set-key (kbd "C-x C-l") 'reload-init-file) 
+
+  (defalias 'list-buffers 'ibuffer-other-window)
+
+  ;; it looks like counsel is a requirement for swiper
+  (use-package counsel
+    :ensure t
+    )
+
+  (use-package swiper
+    :ensure try
+    :config
+    (progn
+      (ivy-mode 1)
+      (setq ivy-use-virtual-buffers t)
+      (global-set-key "\C-s" 'swiper)
+      (global-set-key (kbd "C-c C-r") 'ivy-resume)
+      (global-set-key (kbd "<f6>") 'ivy-resume)
+      (global-set-key (kbd "M-x") 'counsel-M-x)
+      (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+      (global-set-key (kbd "<f1> f") 'counsel-describe-function)
+      (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+      (global-set-key (kbd "<f1> l") 'counsel-load-library)
+      (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+      (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+      (global-set-key (kbd "C-c g") 'counsel-git)
+      (global-set-key (kbd "C-c j") 'counsel-git-grep)
+      (global-set-key (kbd "C-c k") 'counsel-ag)
+      (global-set-key (kbd "C-x l") 'counsel-locate)
+      (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+      (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+      ))
+#+END_SRC
+* Evil mode
+#+BEGIN_SRC emacs-lisp
+  (use-package evil
+    :ensure t
+    :config
+    (evil-mode))
+   (setq evil-auto-indent nil)
+#+END_SRC 
+* Display
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-splash-screen t
+        initial-scratch-message nil
+        initial-major-mode 'org-mode)
+
+  (if window-system
+      (progn (tool-bar-mode -1)
+             (desktop-save-mode 1)
+             (load-theme 'tsdh-light)
+             (set-background-color "#FFFDFB")))
+
+  (when (member "Menlo" (font-family-list)) (set-frame-font "Menlo-14" t))
+
+  ;; Indicate empty lines
+  (setq-default indicate-empty-lines t)
+  (when (not indicate-empty-lines)  
+    (toggle-indicate-empty-lines))
+
+  (show-paren-mode t)
+
+  (setq-default display-line-numbers-type 'visual
+                display-line-numbers-current-absolute t
+                display-line-numbers-width 4
+                display-line-numbers-widen t)
+  (add-hook 'text-mode-hook #'display-line-numbers-mode)
+  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+
+  ;; Subtle flash on error
+  (setq ring-bell-function
+        (lambda ()
+          (let ((orig-fg (face-foreground 'mode-line)))
+            (set-face-foreground 'mode-line "#F2804F")
+            (run-with-idle-timer 0.1 nil
+                                 (lambda (fg) (set-face-foreground 'mode-line fg))
+                                 orig-fg))))
+ #+END_SRC
+* Org mode
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook 'org-bullets-mode))
+
+  (setq org-log-done t
+        org-todo-keywords '((sequence "TODO" "INPROGRESS" "DONE"))
+        org-todo-keyword-faces '(("INPROGRESS" . (:foreground "blue" :weight bold))))
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (flyspell-mode)))
+
+  (use-package writegood-mode
+    :ensure t
+    :config  
+    (add-hook 'org-mode-hook
+              (lambda ()
+                (writegood-mode))))
+
+  (setq org-src-tab-acts-natively t)
+  (add-hook 'org-mode-hook 'org-indent-mode)
+  (add-hook 'org-mode-hook (lambda () (abbrev-mode 1)))
+#+END_SRC
