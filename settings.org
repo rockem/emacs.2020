@@ -115,3 +115,17 @@
   (add-hook 'org-mode-hook 'org-indent-mode)
   (add-hook 'org-mode-hook (lambda () (abbrev-mode 1)))
 #+END_SRC
+* Git
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t)
+
+  (global-set-key (kbd "C-x g") 'magit-status)
+
+  (use-package git-gutter
+    :ensure t
+    :config
+    (global-git-gutter-mode t))
+
+  (add-to-list 'auto-mode-alist '("\\.gitconfig$" . conf-mode))
+#+END_SRC
