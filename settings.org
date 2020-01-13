@@ -69,7 +69,7 @@
     :ensure t
     :config
     (evil-mode))
-   (setq evil-auto-indent nil)
+  (setq evil-auto-indent nil)
 #+END_SRC 
 * Display
 #+BEGIN_SRC emacs-lisp
@@ -147,3 +147,13 @@
 
   (add-to-list 'auto-mode-alist '("\\.gitconfig$" . conf-mode))
 #+END_SRC
+* Language Support
+** CSV 
+#+BEGIN_SRC emacs-lisp
+  (use-package csv-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.csv$" . csv-mode)))
+
+#+END_SRC
+
