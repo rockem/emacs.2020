@@ -157,3 +157,27 @@
 
 #+END_SRC
 
+** Clojure
+#+BEGIN_SRC emacs-lisp
+  (use-package cider
+    :ensure t
+    :pin melpa-stable)
+
+  (add-hook 'clojure-mode-hook 'prettify-symbols-mode)
+  
+  (use-package clojure-mode
+    :mode (("\\.edn$" . clojure-mode))
+    :config
+    (progn
+      (setq clojure-align-forms-automatically t)))
+#+END_SRC
+* Shell
+#+BEGIN_SRC emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t)
+  (when (memq window-system '(mac ns))
+    (setenv "SHELL" "/bin/zsh")
+    (exec-path-from-shell-initialize)
+    (exec-path-from-shell-copy-envs
+     '("PATH")))
+#+END_SRC
