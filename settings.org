@@ -85,17 +85,17 @@
         initial-scratch-message nil
         initial-major-mode 'org-mode)
 
-(use-package all-the-icons)
-
   (use-package kaolin-themes
     :config
-    (load-theme 'kaolin-dark t))
+    (load-theme 'kaolin-valley-dark t))
+
+  (add-to-list 'default-frame-alist '(ns-appearance . dark))
 
   (if window-system
       (progn (tool-bar-mode -1)
              (desktop-save-mode 1)))
-             ;; (load-theme 'tsdh-light)
-             ;; (set-background-color "#FFFDFC")))
+  ;; (load-theme 'tsdh-light)
+  ;; (set-background-color "#FFFDFC")))
 
   (when (member "Menlo" (font-family-list)) (set-frame-font "Menlo-14" t))
   (global-hl-line-mode 1)

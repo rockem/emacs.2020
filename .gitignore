@@ -8,3 +8,5 @@ settings.el
 .#*
 recentf
 *.dat
+eshell
+games
