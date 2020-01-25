@@ -79,27 +79,40 @@
       :diminish company-mode)
 
 #+END_SRC
+* Theme
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package kaolin-themes
+  ;;   :config
+  ;;   (load-theme 'kaolin-valley-dark t))
+
+  ;; (add-to-list 'default-frame-alist '(ns-appearance . dark))
+
+  (use-package highlight-numbers
+    :config
+    (add-hook 'prog-mode-hook 'highlight-numbers-mode))
+
+  (add-to-list 'custom-theme-load-path (expand-file-name "themes" user-emacs-directory))
+  (use-package solarized-theme
+    :config
+    (setq solarized-high-contrast-mode-line t)
+    (load-theme 'solarized-mesa-light t))
+
+  (when (member "Menlo" (font-family-list)) (set-frame-font "Menlo-14" t))
+  ;;    (global-hl-line-mode 1)
+  ;; (set-face-background 'hl-line "#FFF3E1")
+
+#+END_SRC
 * Display
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-splash-screen t
         initial-scratch-message nil
         initial-major-mode 'org-mode)
 
-  (use-package kaolin-themes
-    :config
-    (load-theme 'kaolin-valley-dark t))
-
-  (add-to-list 'default-frame-alist '(ns-appearance . dark))
-
   (if window-system
       (progn (tool-bar-mode -1)
              (desktop-save-mode 1)))
   ;; (load-theme 'tsdh-light)
   ;; (set-background-color "#FFFDFC")))
-
-  (when (member "Menlo" (font-family-list)) (set-frame-font "Menlo-14" t))
-  (global-hl-line-mode 1)
-  ;; (set-face-background 'hl-line "#FFF3E1")
 
   ;; Indicate empty lines
   (setq-default indicate-empty-lines t)
