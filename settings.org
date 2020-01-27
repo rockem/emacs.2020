@@ -91,15 +91,24 @@
     :config
     (add-hook 'prog-mode-hook 'highlight-numbers-mode))
 
-  (add-to-list 'custom-theme-load-path (expand-file-name "themes" user-emacs-directory))
-  (use-package solarized-theme
-    :config
-    (setq solarized-high-contrast-mode-line t)
-    (load-theme 'solarized-mesa-light t))
+  ;; (add-to-list 'custom-theme-load-path (expand-file-name "themes" user-emacs-directory))
+  ;; (use-package solarized-theme
+  ;;   :config
+  ;;   (setq solarized-high-contrast-mode-line t)
+  ;;   (load-theme 'solarized-mesa-light t))
+
+  ;; (load-theme 'monokai t)
 
   (when (member "Menlo" (font-family-list)) (set-frame-font "Menlo-14" t))
   ;;    (global-hl-line-mode 1)
   ;; (set-face-background 'hl-line "#FFF3E1")
+
+  (use-package nord-theme
+    :config
+    (setq line-spacing 0.2)
+    (set-face-attribute 'highlight-numbers-number nil :foreground "#EF7738")
+    (load-theme 'nord t))
+
 
 #+END_SRC
 * Display
