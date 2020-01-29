@@ -1,7 +1,19 @@
 ;; Melpa
-(require 'package)
-(add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/") t)
+;; (require 'package)
+;; (add-to-list 'package-archives
+;; 	     ('("melpa" . "https://melpa.org/packages/") 
+;; 	      '("melpa-stable" . "https://stable.melpa.org/packages/"))
+;; 	     t)
+
+(setq package-archives
+      '(("gnu-elpa"     . "https://elpa.gnu.org/packages/")
+        ("melpa-stable" . "https://stable.melpa.org/packages/")
+        ("melpa"        . "https://melpa.org/packages/"))
+      package-archive-priorities
+      '(("melpa-stable" . 10)
+        ("gnu-elpa"     . 5)
+        ("melpa"        . 0)))
+
 
 (package-initialize)
 (setq package-enable-at-startup nil)
