@@ -3,9 +3,12 @@
 * Evil mode
 #+BEGIN_SRC emacs-lisp
   (use-package evil
-     :ensure t
-     :config
-     (evil-mode))
+    :ensure t
+    :init
+    (setq evil-want-C-u-scroll t)
+    :config
+    (evil-mode))
+  (evil-define-key 'normal org-mode-map (kbd "<tab>") #'org-cycle)
 #+END_SRC 
 * Bootstrap
 #+BEGIN_SRC emacs-lisp
@@ -23,6 +26,40 @@
 
   (defalias 'list-buffers 'ibuffer-other-window)
 
+  (defun diminished-modes ()
+    "Echo all active diminished or minor modes as if they were minor.
+  The display goes in the echo area; if it's too long even for that,
+  you can see the whole thing in the *Messages* buffer.
+  This doesn't change the status of any modes; it just lets you see
+  what diminished modes would be on the mode-line if they were still minor."
+    (interactive)
+    (let ((minor-modes minor-mode-alist)
+          message)
+      (while minor-modes
+        (when (symbol-value (caar minor-modes))
+          ;; This minor mode is active in this buffer
+          (let* ((mode-pair (car minor-modes))
+                 (mode (car mode-pair))
+                 (minor-pair (or (assq mode diminished-mode-alist) mode-pair))
+                 (minor-name (cadr minor-pair)))
+            (when (symbolp minor-name)
+              ;; This minor mode uses symbol indirection in the cdr
+              (let ((symbols-seen (list minor-name)))
+                (while (and (symbolp (callf symbol-value minor-name))
+                            (not (memq minor-name symbols-seen)))
+                  (push minor-name symbols-seen))))
+            (push minor-name message)))
+        (call cdr minor-modes))
+      ;; Handle :eval forms
+      (setq message (mapconcat
+                     (lambda (form)
+                       (if (and (listp form) (eq (car form) :eval))
+                           (apply 'eval (cdr form))
+                         form))
+                     (nreverse message) ""))
+      (when (= (string-to-char message) ?\ )
+        (callf substring message 1))
+      (message "%s" message)))
 
   (use-package diminish
     :ensure t)
@@ -54,29 +91,35 @@
       (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
       ))
 
-      (use-package ace-window
-        :ensure t
-        :init
-        (progn
-          (global-set-key [remap other-window] 'ace-window)
-          (custom-set-faces
-           '(aw-leading-char-face
-             ((t (:inherit ace-jump-face-foreground :height 3.0))))) 
-          ))
-    (use-package company               
-      :ensure t
-      :defer t
-      :init (global-company-mode)
-      :config
-      (progn
-        ;; Use Company for completion
-        (bind-key [remap completion-at-point] #'company-complete company-mode-map)
+  (use-package ace-window
+    :ensure t
+    :init
+    (progn
+      (global-set-key [remap other-window] 'ace-window)
+      (custom-set-faces
+       '(aw-leading-char-face
+         ((t (:inherit ace-jump-face-foreground :height 3.0))))) 
+      ))
 
-        (setq company-tooltip-align-annotations t
-              ;; Easy navigation to candidates with M-<n>
-              company-show-numbers t)
-        (setq company-dabbrev-downcase nil))
-      :diminish company-mode)
+  (use-package company               
+    :ensure t
+    :defer t
+    :init (global-company-mode)
+    :config
+    (progn
+      ;; Use Company for completion
+      (bind-key [remap completion-at-point] #'company-complete company-mode-map)
+
+      (setq company-tooltip-align-annotations t
+            ;; Easy navigation to candidates with M-<n>
+            company-show-numbers t)
+      (setq company-dabbrev-downcase nil))
+    :diminish company-mode)
+
+  (use-package winum
+  :ensure t
+  :config
+  (winum-mode))
 
 #+END_SRC
 * Theme
@@ -99,7 +142,7 @@
 
   ;; (load-theme 'monokai t)
 
-  (when (member "Menlo" (font-family-list)) (set-frame-font "Menlo-14" t))
+  (when (member "Menlo" (font-family-list)) (set-frame-font "Menlo-17" t))
   ;;    (global-hl-line-mode 1)
   ;; (set-face-background 'hl-line "#FFF3E1")
 
@@ -137,6 +180,11 @@
   (add-hook 'text-mode-hook #'display-line-numbers-mode)
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
+  (use-package telephone-line
+    :ensure t
+    :config
+    (telephone-line-mode 1))
+
   ;; Subtle flash on error
   (setq ring-bell-function
         (lambda ()
@@ -145,7 +193,59 @@
             (run-with-idle-timer 0.1 nil
                                  (lambda (fg) (set-face-foreground 'mode-line fg))
                                  orig-fg))))
- #+END_SRC
+
+  (defun diminished-modes ()
+    "Echo all active diminished or minor modes as if they were minor.
+  The display goes in the echo area; if it's too long even for that,
+  you can see the whole thing in the *Messages* buffer.
+  This doesn't change the status of any modes; it just lets you see
+  what diminished modes would be on the mode-line if they were still minor."
+    (interactive)
+    (let ((minor-modes minor-mode-alist)
+          message)
+      (while minor-modes
+        (when (symbol-value (caar minor-modes))
+          ;; This minor mode is active in this buffer
+          (let* ((mode-pair (car minor-modes))
+                 (mode (car mode-pair))
+                 (minor-pair (or (assq mode diminished-mode-alist) mode-pair))
+                 (minor-name (cadr minor-pair)))
+            (when (symbolp minor-name)
+              ;; This minor mode uses symbol indirection in the cdr
+              (let ((symbols-seen (list minor-name)))
+                (while (and (symbolp (callf symbol-value minor-name))
+                            (not (memq minor-name symbols-seen)))
+                  (push minor-name symbols-seen))))
+            (push minor-name message)))
+        (callf cdr minor-modes))
+      ;; Handle :eval forms
+      (setq message (mapconcat
+                     (lambda (form)
+                       (if (and (listp form) (eq (car form) :eval))
+                           (apply 'eval (cdr form))
+                         form))
+                     (nreverse message) ""))
+      (when (= (string-to-char message) ?\ )
+        (callf substring message 1))
+      (message "%s" message)))
+#+END_SRC
+* Side Tree
+#+BEGIN_SRC emacs-lisp
+  (use-package treemacs
+    :ensure t
+    :defer t
+    :init
+    (with-eval-after-load 'winum
+      (define-key winum-keymap (kbd "M-0") #'treemacs-select-window)))
+
+  (use-package treemacs-projectile
+    :after (treemacs projectile)
+    :ensure t)
+
+  (use-package treemacs-evil
+    :after (treemacs evil)
+    :ensure t)
+#+END_SRC
 * Org mode
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
@@ -186,6 +286,15 @@
   (add-to-list 'auto-mode-alist '("\\.gitconfig$" . conf-mode))
   (add-hook 'with-editor-mode-hook 'evil-insert-state)
 #+END_SRC
+* Project
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t
+    :config
+    (projectile-mode +1)
+    (define-key projectile-mode-map (kbd "C-c p") #'projectile-command-map))
+
+#+END_SRC
 * Language Support
 ** CSV 
 #+BEGIN_SRC emacs-lisp
@@ -201,11 +310,15 @@
     :pin melpa-stable)
 
   (add-hook 'clojure-mode-hook 'prettify-symbols-mode)
-  
+
+  (use-package flycheck-clj-kondo
+    :ensure t)
+
   (use-package clojure-mode
     :mode (("\\.edn$" . clojure-mode))
     :config
     (progn
+      (require 'flycheck-clj-kondo)
       (setq clojure-align-forms-automatically t)))
 #+END_SRC
 ** Groovy
@@ -226,4 +339,7 @@
     (exec-path-from-shell-initialize)
     (exec-path-from-shell-copy-envs
      '("PATH")))
+
+  (use-package vterm
+    :ensure t)
 #+END_SRC

@@ -10,3 +10,9 @@ recentf
 *.dat
 eshell
 games
+/.cache/
+\#*\#
+projects
+*.eld
+transient/
+tutorial/
